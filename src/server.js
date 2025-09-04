@@ -3,15 +3,19 @@ const cors = require("cors");
 const helmet = require("helmet");
 const rateLimit = require("express-rate-limit");
 require("dotenv").config();
+const seedDatabase = require("./scripts/seedDatabase");
 
 const connectDB = require("./config/database");
-const errorHandler = require("./middleware/errorHandler");
+const { errorHandler } = require("./middleware/errorHandler");
 const routes = require("./routes");
 
 const app = express();
 
 // Connect to Database
 connectDB();
+
+// Seed Database
+seedDatabase();
 
 // Middleware
 app.use(helmet());
@@ -43,12 +47,12 @@ app.get("/api/health", (req, res) => {
 });
 
 // 404 handler
-app.use("*", (req, res) => {
-  res.status(404).json({
-    status: false,
-    message: "Route not found",
-  });
-});
+// app.use("/:*", (req, res) => {
+//   res.status(404).json({
+//     status: false,
+//     message: "Route not found",
+//   });
+// });
 
 // Error handling middleware
 app.use(errorHandler);
