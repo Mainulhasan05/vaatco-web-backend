@@ -30,6 +30,7 @@ class ProductService {
 
     const product = new Product({
       ...productData,
+      shortDescription: productData.description.substring(0, 100),
       slug,
       createdBy,
     });

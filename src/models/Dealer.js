@@ -32,14 +32,6 @@ const dealerSchema = new mongoose.Schema(
       required: [true, "Phone number is required"],
       trim: true,
     },
-    alternatePhone: {
-      type: String,
-      trim: true,
-    },
-    whatsapp: {
-      type: String,
-      trim: true,
-    },
     location: {
       type: String,
       trim: true,
