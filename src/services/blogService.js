@@ -41,6 +41,10 @@ class BlogService {
       blogData.publishDate = new Date();
     }
 
+    if (blogData.content) {
+      blogData.excerpt = blogData.content.substring(0, 200);
+    }
+
     const blog = new Blog({
       ...blogData,
       slug,
