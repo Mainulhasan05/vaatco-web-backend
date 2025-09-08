@@ -2,7 +2,7 @@ const router = require("express").Router();
 // Import Routes
 const adminRoutes = require("./adminRoutes");
 const productRoutes = require("./productRoutes");
-// const dealerRoutes = require("./dealerRoutes");
+const dealerRoutes = require("./dealerRoutes");
 const galleryRoutes = require("./galleryRoutes");
 // const blogRoutes = require("./blogRoutes");
 // const teamRoutes = require("./teamRoutes");
@@ -13,7 +13,7 @@ const publicRoutes = require("./publicRoutes");
 // Routes
 router.use("/admin", adminRoutes);
 router.use("/products", productRoutes);
-// router.use("/dealers", dealerRoutes);
+router.use("/dealers", dealerRoutes);
 router.use("/gallery", galleryRoutes);
 router.use("/public", publicRoutes);
 

@@ -32,6 +32,10 @@ const dealerSchema = new mongoose.Schema(
       required: [true, "Phone number is required"],
       trim: true,
     },
+    district: {
+      type: String,
+      trim: true,
+    },
     location: {
       type: String,
       trim: true,
@@ -41,7 +45,6 @@ const dealerSchema = new mongoose.Schema(
       website: String,
       youtube: String,
     },
-    images: [String],
     rating: {
       type: Number,
       min: 0,
