@@ -23,10 +23,9 @@ const blogSchema = new mongoose.Schema(
       required: [true, "Blog content is required"],
     },
     featuredImage: {
-      url: String,
-      public_id: String,
-      alt: String,
+      type: String,
     },
+    images: [String],
     tags: [
       {
         type: String,
@@ -51,15 +50,7 @@ const blogSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
-    readTime: {
-      type: Number, // in minutes
-      default: 0,
-    },
     views: {
-      type: Number,
-      default: 0,
-    },
-    likes: {
       type: Number,
       default: 0,
     },
