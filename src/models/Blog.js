@@ -25,6 +25,9 @@ const blogSchema = new mongoose.Schema(
     featuredImage: {
       type: String,
     },
+    readTime: {
+      type: String,
+    },
     images: [String],
     tags: [
       {

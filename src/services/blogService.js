@@ -26,8 +26,10 @@ class BlogService {
 
   // Calculate read time based on content
   static calculateReadTime(content) {
+    if (!content) return 0;
     const wordsPerMinute = 200;
     const wordCount = content.split(/\s+/).length;
+
     return Math.ceil(wordCount / wordsPerMinute);
   }
 
@@ -217,6 +219,7 @@ class BlogService {
     // Recalculate read time if content changed
     if (updateData.content && updateData.content !== blog.content) {
       updateData.readTime = this.calculateReadTime(updateData.content);
+      updateData.excerpt = updateData.content.substring(0, 200);
     }
 
     // Auto-set publish date if status changes to published
