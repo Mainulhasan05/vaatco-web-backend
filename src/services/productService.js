@@ -179,6 +179,13 @@ class ProductService {
     if (updateData.name && updateData.name !== product.name) {
       updateData.slug = await this.generateUniqueSlug(updateData.name, id);
     }
+    // if description is changed then update short description
+    if (
+      updateData.description &&
+      updateData.description !== product.description
+    ) {
+      updateData.shortDescription = updateData.description.substring(0, 100);
+    }
 
     const updatedProduct = await Product.findByIdAndUpdate(
       id,
