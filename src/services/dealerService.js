@@ -70,7 +70,8 @@ class DealerService {
         page,
         limit,
         total,
-        pages: Math.ceil(total / limit),
+        totalPages: Math.ceil(total / limit), // Changed from "pages"
+        totalItems: total, // Added this
         hasNext: page < Math.ceil(total / limit),
         hasPrev: page > 1,
       },
