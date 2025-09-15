@@ -8,7 +8,7 @@ class DealerController {
       const filters = {
         page: parseInt(req.query.page) || 1,
         limit: parseInt(req.query.limit) || 12,
-        search: req.query.search,
+        search: req.query.keyword,
         location: req.query.location,
         isVerified:
           req.query.verified === "true"
