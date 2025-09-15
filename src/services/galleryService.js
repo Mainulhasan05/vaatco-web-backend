@@ -58,7 +58,7 @@ class GalleryService {
     try {
       const {
         page = 1,
-        limit = 20,
+        limit = 200,
         isActive,
         isFeatured,
         sortBy = "createdAt",

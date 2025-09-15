@@ -54,7 +54,7 @@ class GalleryController {
     try {
       const filters = {
         page: parseInt(req.query.page) || 1,
-        limit: parseInt(req.query.limit) || 20,
+        limit: parseInt(req.query.limit) || 200,
         isActive:
           req.query.isActive !== undefined
             ? req.query.isActive === "true"
