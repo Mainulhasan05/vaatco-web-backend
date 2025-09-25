@@ -13,6 +13,6 @@ router.get("/images", GalleryController.getPublicFeaturedImages);
 router.get("/gallery/:id", GalleryController.getImageById);
 // Public routes
 router.get("/blogs", BlogController.getBlogsPublic);
-router.get("/blog/:slug", BlogController.getBlogBySlug);
+router.get("/blogs/:slug", BlogController.getBlogBySlug);
 
 module.exports = router;
