@@ -10,6 +10,8 @@ const router = express.Router();
 
 // Public routes
 router.post("/login", AdminController.login);
+router.post("/forgot-password", AdminController.forgotPassword);
+router.put("/reset-password/:token", AdminController.resetPassword);
 
 // Protected routes (require authentication)
 router.use(protect);
@@ -19,9 +21,6 @@ router.get("/profile", AdminController.getProfile);
 // router.put("/profile", AdminController.updateProfile);
 router.put("/change-password", AdminController.changePassword);
 router.post("/logout", AdminController.logout);
-
-router.post("/forgot-password", AdminController.forgotPassword);
-router.put("/reset-password/:token", AdminController.resetPassword);
 
 // Dashboard
 router.get("/dashboard/stats", AdminController.getDashboardStats);
