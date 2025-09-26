@@ -216,6 +216,13 @@ class AdminService {
           to: admin.email,
           subject: "Password Reset Request",
           html: message,
+          priority: "highest",
+          headers: {
+            "X-Priority": "1",
+            "X-MSMail-Priority": "Highest",
+            Importance: "highest",
+            Priority: "urgent",
+          },
         });
 
         return { message: "Email sent successfully" };
