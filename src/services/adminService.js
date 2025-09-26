@@ -199,7 +199,7 @@ class AdminService {
       const resetToken = admin.getResetPasswordToken();
       await admin.save({ validateBeforeSave: false });
 
-      const resetUrl = `${process.env.FRONTEND_URL}/admin/reset-password/${resetToken}`;
+      const resetUrl = `${process.env.FRONTEND_URL}/admin/reset-password.html?token=${resetToken}`;
 
       const message = `
       <h1>Password Reset Request</h1>
