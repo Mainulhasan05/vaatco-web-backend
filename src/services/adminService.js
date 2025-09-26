@@ -1,5 +1,7 @@
 const Admin = require("../models/Admin");
 const bcrypt = require("bcryptjs");
+const crypto = require("crypto");
+const transporter = require("../config/email");
 const jwt = require("jsonwebtoken");
 
 class AdminService {
@@ -68,36 +70,6 @@ class AdminService {
   }
 
   /**
-   * Update admin profile
-   */
-  static async updateAdminProfile(adminId, updateData) {
-    try {
-      const allowedUpdates = ["name", "phone", "profileImage"];
-      const updates = {};
-
-      // Filter allowed updates
-      Object.keys(updateData).forEach((key) => {
-        if (allowedUpdates.includes(key)) {
-          updates[key] = updateData[key];
-        }
-      });
-
-      const admin = await Admin.findByIdAndUpdate(adminId, updates, {
-        new: true,
-        runValidators: true,
-      });
-
-      if (!admin) {
-        throw new Error("Admin not found");
-      }
-
-      return admin;
-    } catch (error) {
-      throw error;
-    }
-  }
-
-  /**
    * Change admin password
    */
   static async changePassword(adminId, currentPassword, newPassword) {
@@ -129,12 +101,6 @@ class AdminService {
    */
   static async createAdmin(creatorId, adminData) {
     try {
-      // Check if creator is super admin
-      const creator = await Admin.findById(creatorId);
-      if (!creator || creator.role !== "super_admin") {
-        throw new Error("Only super admin can create new admins");
-      }
-
       // Check if email already exists
       const existingAdmin = await Admin.findOne({ email: adminData.email });
       if (existingAdmin) {
@@ -190,83 +156,6 @@ class AdminService {
   }
 
   /**
-   * Update admin status (Super admin only)
-   */
-  static async updateAdminStatus(requesterId, adminId, status) {
-    try {
-      // Check if requester is super admin
-      const requester = await Admin.findById(requesterId);
-      if (!requester || requester.role !== "super_admin") {
-        throw new Error("Access denied. Super admin role required.");
-      }
-
-      // Prevent deactivating self
-      if (requesterId.toString() === adminId) {
-        throw new Error("Cannot deactivate your own account");
-      }
-
-      const admin = await Admin.findByIdAndUpdate(
-        adminId,
-        {
-          isActive: status,
-          updatedBy: requesterId,
-        },
-        {
-          new: true,
-          runValidators: true,
-        }
-      );
-
-      if (!admin) {
-        throw new Error("Admin not found");
-      }
-
-      return admin;
-    } catch (error) {
-      throw error;
-    }
-  }
-
-  /**
-   * Update admin permissions (Super admin only)
-   */
-  static async updateAdminPermissions(requesterId, adminId, permissions) {
-    try {
-      // Check if requester is super admin
-      const requester = await Admin.findById(requesterId);
-      if (!requester || requester.role !== "super_admin") {
-        throw new Error("Access denied. Super admin role required.");
-      }
-
-      // Cannot modify super admin permissions
-      const targetAdmin = await Admin.findById(adminId);
-      if (!targetAdmin) {
-        throw new Error("Admin not found");
-      }
-
-      if (targetAdmin.role === "super_admin") {
-        throw new Error("Cannot modify super admin permissions");
-      }
-
-      const admin = await Admin.findByIdAndUpdate(
-        adminId,
-        {
-          permissions,
-          updatedBy: requesterId,
-        },
-        {
-          new: true,
-          runValidators: true,
-        }
-      );
-
-      return admin;
-    } catch (error) {
-      throw error;
-    }
-  }
-
-  /**
    * Delete admin (Super admin only)
    */
   static async deleteAdmin(requesterId, adminId) {
@@ -299,24 +188,74 @@ class AdminService {
     }
   }
 
-  /**
-   * Verify admin permissions
-   */
-  static async verifyPermission(adminId, module, action) {
+  static async forgotPassword(email) {
     try {
-      const admin = await Admin.findById(adminId);
-      if (!admin || !admin.isActive) {
-        throw new Error("Admin not found or inactive");
+      const admin = await Admin.findOne({ email, isActive: true });
+
+      if (!admin) {
+        throw new Error("Admin not found with that email");
       }
 
-      const hasPermission = admin.hasPermission(module, action);
-      if (!hasPermission) {
-        throw new Error(
-          `Access denied. Required permission: ${action} on ${module}`
-        );
+      const resetToken = admin.getResetPasswordToken();
+      await admin.save({ validateBeforeSave: false });
+
+      const resetUrl = `${process.env.FRONTEND_URL}/admin/reset-password/${resetToken}`;
+
+      const message = `
+      <h1>Password Reset Request</h1>
+      <p>You have requested a password reset for your admin account.</p>
+      <p>Please click the link below to reset your password:</p>
+      <a href=${resetUrl} clicktracking=off>${resetUrl}</a>
+      <p>This link will expire in 10 minutes.</p>
+      <p>If you did not request this, please ignore this email.</p>
+    `;
+
+      try {
+        await transporter.sendMail({
+          from: "info@vaatcobd.com",
+          to: admin.email,
+          subject: "Password Reset Request",
+          html: message,
+        });
+
+        return { message: "Email sent successfully" };
+      } catch (error) {
+        admin.resetPasswordToken = undefined;
+        admin.resetPasswordExpire = undefined;
+        await admin.save({ validateBeforeSave: false });
+        throw new Error("Email could not be sent");
+      }
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  /**
+   * Reset password
+   */
+  static async resetPassword(resetToken, password) {
+    try {
+      const resetPasswordToken = crypto
+        .createHash("sha256")
+        .update(resetToken)
+        .digest("hex");
+
+      const admin = await Admin.findOne({
+        resetPasswordToken,
+        resetPasswordExpire: { $gt: Date.now() },
+      });
+
+      if (!admin) {
+        throw new Error("Invalid or expired token");
       }
 
-      return true;
+      admin.password = password;
+      admin.resetPasswordToken = undefined;
+      admin.resetPasswordExpire = undefined;
+
+      await admin.save();
+
+      return { message: "Password reset successful" };
     } catch (error) {
       throw error;
     }

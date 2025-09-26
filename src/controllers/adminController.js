@@ -100,6 +100,61 @@ class AdminController {
     }
   }
 
+  static async forgotPassword(req, res) {
+    try {
+      const { email } = req.body;
+
+      if (!email) {
+        return ResponseHelper.validationError(res, {
+          email: "Email is required",
+        });
+      }
+
+      const result = await AdminService.forgotPassword(email);
+
+      return ResponseHelper.success(res, null, result.message);
+    } catch (error) {
+      return ResponseHelper.error(res, error.message, 400);
+    }
+  }
+
+  /**
+   * Reset password
+   */
+  static async resetPassword(req, res) {
+    try {
+      const { token } = req.params;
+      const { password, confirmPassword } = req.body;
+
+      if (!password || !confirmPassword) {
+        return ResponseHelper.validationError(res, {
+          password: password ? null : "Password is required",
+          confirmPassword: confirmPassword
+            ? null
+            : "Confirm password is required",
+        });
+      }
+
+      if (password !== confirmPassword) {
+        return ResponseHelper.validationError(res, {
+          confirmPassword: "Passwords do not match",
+        });
+      }
+
+      if (password.length < 6) {
+        return ResponseHelper.validationError(res, {
+          password: "Password must be at least 6 characters long",
+        });
+      }
+
+      const result = await AdminService.resetPassword(token, password);
+
+      return ResponseHelper.success(res, null, result.message);
+    } catch (error) {
+      return ResponseHelper.error(res, error.message, 400);
+    }
+  }
+
   /**
    * Create new admin (Super admin only)
    */
@@ -130,54 +185,6 @@ class AdminController {
         result.admins,
         result.pagination,
         "Admins retrieved successfully"
-      );
-    } catch (error) {
-      return ResponseHelper.error(res, error.message, 403);
-    }
-  }
-
-  /**
-   * Update admin status (Super admin only)
-   */
-  static async updateAdminStatus(req, res) {
-    try {
-      const { adminId } = req.params;
-      const { isActive } = req.body;
-
-      const admin = await AdminService.updateAdminStatus(
-        req.admin._id,
-        adminId,
-        isActive
-      );
-
-      return ResponseHelper.updated(
-        res,
-        admin,
-        "Admin status updated successfully"
-      );
-    } catch (error) {
-      return ResponseHelper.error(res, error.message, 403);
-    }
-  }
-
-  /**
-   * Update admin permissions (Super admin only)
-   */
-  static async updateAdminPermissions(req, res) {
-    try {
-      const { adminId } = req.params;
-      const { permissions } = req.body;
-
-      const admin = await AdminService.updateAdminPermissions(
-        req.admin._id,
-        adminId,
-        permissions
-      );
-
-      return ResponseHelper.updated(
-        res,
-        admin,
-        "Admin permissions updated successfully"
       );
     } catch (error) {
       return ResponseHelper.error(res, error.message, 403);

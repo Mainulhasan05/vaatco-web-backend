@@ -4,7 +4,11 @@ const slugify = require("slugify");
 class BlogService {
   // Generate unique slug
   static async generateUniqueSlug(title, excludeId = null) {
-    let baseSlug = slugify(title, { lower: true, strict: true });
+    let baseSlug = slugify(title, {
+      lower: true,
+      locale: "bn", // Bengali locale
+      remove: /[*+~.()'"!:@]/g, // what to strip
+    });
     let slug = baseSlug;
     let counter = 1;
 
