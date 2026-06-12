@@ -17,9 +17,8 @@ connectDB();
 // Seed Database
 seedDatabase();
 
-// CORS must be applied BEFORE helmet so headers are not overridden
+// CORS — applied before helmet so headers are not overridden
 app.use(cors());
-app.options("*", cors());
 
 app.use(
   helmet({
