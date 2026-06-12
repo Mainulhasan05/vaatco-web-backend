@@ -49,8 +49,14 @@ class AdminService {
    * Generate JWT token
    */
   static generateToken(adminId) {
+    const configuredExpiry = process.env.JWT_EXPIRE?.trim();
+    const expiresIn =
+      configuredExpiry && !/^0\s*(ms|s|m|h|d|w|y)?$/i.test(configuredExpiry)
+        ? configuredExpiry
+        : "30d";
+
     return jwt.sign({ adminId }, process.env.JWT_SECRET, {
-      expiresIn: process.env.JWT_EXPIRE,
+      expiresIn,
     });
   }
 
