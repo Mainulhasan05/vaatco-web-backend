@@ -51,6 +51,9 @@ app.get("/api/health", (req, res) => {
     status: true,
     message: "VAATCO Backend API is running successfully",
     timestamp: new Date().toISOString(),
+    jwtConfigured: !!process.env.JWT_SECRET,
+    jwtSecretLength: process.env.JWT_SECRET ? process.env.JWT_SECRET.length : 0,
+    jwtExpire: process.env.JWT_EXPIRE,
   });
 });
 

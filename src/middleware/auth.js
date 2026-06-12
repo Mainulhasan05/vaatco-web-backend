@@ -30,7 +30,7 @@ const protect = async (req, res, next) => {
       const admin = await Admin.findById(decoded.adminId);
 
       if (!admin) {
-        return ResponseHelper.unauthorized(res, "Invalid access token");
+        return ResponseHelper.unauthorized(res, `Invalid access token: Admin not found for ID ${decoded.adminId}`);
       }
 
       if (!admin.isActive) {
@@ -41,7 +41,7 @@ const protect = async (req, res, next) => {
       req.admin = admin;
       next();
     } catch (error) {
-      return ResponseHelper.unauthorized(res, "Invalid access token");
+      return ResponseHelper.unauthorized(res, `Invalid access token: ${error.message}`);
     }
   } catch (error) {
     return ResponseHelper.serverError(res, "Authentication error");
