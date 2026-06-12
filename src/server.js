@@ -17,7 +17,10 @@ connectDB();
 // Seed Database
 seedDatabase();
 
-// Middleware
+// CORS must be applied BEFORE helmet so headers are not overridden
+app.use(cors());
+app.options("*", cors());
+
 app.use(
   helmet({
     crossOriginResourcePolicy: false,
@@ -25,22 +28,6 @@ app.use(
     crossOriginOpenerPolicy: false,
   })
 );
-
-// Permissive CORS configuration to accept requests from any origin
-app.use(
-  cors({
-    origin: function (origin, callback) {
-      // Allow requests with no origin (like mobile apps, curl, postman) or any origin
-      callback(null, true);
-    },
-    credentials: true,
-    methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With", "Accept"],
-  })
-);
-
-// Enable CORS pre-flight for all routes
-app.options("*", cors());
 
 app.use(express.json({ limit: "20mb" }));
 app.use(express.urlencoded({ extended: true, limit: "20mb" }));
